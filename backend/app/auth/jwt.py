@@ -1,9 +1,10 @@
-from jose import jwt
+from jose import jwt, JWTError
 from datetime import datetime, timedelta
 
 SECRET_KEY = "market9ja_super_secret_key"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
 
 def create_access_token(data: dict):
     to_encode = data.copy()
@@ -19,3 +20,22 @@ def create_access_token(data: dict):
         SECRET_KEY,
         algorithm=ALGORITHM
     )
+
+
+def verify_access_token(token: str):
+    try:
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM]
+        )
+
+        email = payload.get("sub")
+
+        if email is None:
+            return None
+
+        return email
+
+    except JWTError:
+        return None

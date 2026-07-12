@@ -6,11 +6,13 @@ from app.models.user import User
 from app.schemas.user import UserCreate, UserResponse, UserLogin
 from app.auth.security import hash_password, verify_password
 from app.auth.jwt import create_access_token
+from app.auth.dependencies import get_current_user
 
 router = APIRouter(
     prefix="/users",
     tags=["Users"]
 )
+
 
 @router.post(
     "/register",
@@ -78,4 +80,15 @@ def login(
     return {
         "access_token": access_token,
         "token_type": "bearer"
+    }
+
+
+@router.get("/me")
+def get_me(
+    current_user: User = Depends(get_current_user)
+):
+    return {
+        "id": current_user.id,
+        "full_name": current_user.full_name,
+        "email": current_user.email
     }
